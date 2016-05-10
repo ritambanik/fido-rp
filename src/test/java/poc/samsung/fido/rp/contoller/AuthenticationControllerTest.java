@@ -23,14 +23,17 @@ import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 
 import poc.samsung.fido.rp.FidoRpApplication;
+import poc.samsung.fido.rp.domain.AuthRequest;
 import poc.samsung.fido.rp.repositories.AuthRequestRepository;
 
 /**
@@ -61,7 +64,7 @@ public class AuthenticationControllerTest {
 	public final void testVerifyLogin() {
 		// Invoking the API
 		Map<String, Object> apiResponse = restTemplate.getForObject(
-				"http://localhost:8080/fido-rp/login/ritam?pwd=welcome",Map.class, Collections.EMPTY_MAP);
+				"http://localhost:8080/fido-rp/login/ritam?pwd=welcome", Map.class, Collections.EMPTY_MAP);
 		System.out.println("Output = " + apiResponse.toString());
 		assertNotNull(apiResponse);
 		assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
@@ -104,4 +107,39 @@ public class AuthenticationControllerTest {
 		}
 	}
 
+	/**
+	 * Test method for
+	 * {@link poc.samsung.fido.rp.contoller.AuthenticationController#requestAuthentication(java.lang.String, poc.samsung.fido.rp.domain.AuthRequest)}
+	 * .
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
+	public final void testUpdateAuthorizationStatus() {
+		AuthRequest req = new AuthRequest();
+		req.setUserId("ritam");
+		req.setReqType("New");
+		req.setReqTime(Calendar.getInstance().getTime());
+		req.setReqStatus("I");
+		authRepository.save(req);
+
+		Map<String, Object> requestBody = new HashMap<String, Object>();
+		HttpHeaders requestHeaders = new HttpHeaders();
+		requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+		// Creating http entity object with request body and headers
+		try {
+			HttpEntity<String> httpEntity = new HttpEntity<String>(OBJECT_MAPPER.writeValueAsString(requestBody),
+					requestHeaders);
+
+			// Invoking the API
+			Map<String, Object> apiResponse = (Map) restTemplate.exchange(
+					"http://localhost:8080/fido-rp/updateAuthorizationStatus/ritam/" + req.getAuthId() + "?newStatus=R",
+					HttpMethod.PUT, httpEntity, Map.class).getBody();
+			assertNotNull(apiResponse);
+			assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
+			authRepository.delete(req.getAuthId());
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
