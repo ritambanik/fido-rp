@@ -4,6 +4,7 @@
 package poc.samsung.fido.rp.domain;
 
 import java.util.Date;
+import java.util.Random;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,22 +20,30 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name="AUTH_REQUEST")
 public class AuthRequest {
+	
+	private static transient final Random KEY_GENERATOR = new Random();
+	private static transient final long RANGE = 1234567l;
+	
     @Id
-    @Column(name="auth_id")
-	private int authId;
+    @Column(name="request_id")
+	private long authId;
 	@Column(name="user_id")
 	private String userId;
 	@Column(name="requested_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date reqTime;
-	@Column(name="requested_type")
+	@Column(name="request_type")
 	private String reqType;
-	@Column(name="status")
+	@Column(name="request_status")
 	private String reqStatus;
+	
+	public AuthRequest() {
+		authId = (long)(KEY_GENERATOR.nextDouble() * RANGE);
+	}
 	/**
 	 * @return the authId
 	 */
-	public int getAuthId() {
+	public long getAuthId() {
 		return authId;
 	}
 	/**
