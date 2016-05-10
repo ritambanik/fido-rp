@@ -8,10 +8,14 @@ import java.util.Random;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import poc.samsung.fido.rp.domain.type.AuthRequetStatus;
 
 /**
  * @author user
@@ -35,7 +39,8 @@ public class AuthRequest {
 	@Column(name="request_type")
 	private String reqType;
 	@Column(name="request_status")
-	private String reqStatus;
+	@Enumerated(EnumType.STRING)
+	private AuthRequetStatus reqStatus;
 	
 	public AuthRequest() {
 		authId = (long)(KEY_GENERATOR.nextDouble() * RANGE);
@@ -91,13 +96,13 @@ public class AuthRequest {
 	/**
 	 * @return the reqStatus
 	 */
-	public String getReqStatus() {
+	public AuthRequetStatus getReqStatus() {
 		return reqStatus;
 	}
 	/**
 	 * @param reqStatus the reqStatus to set
 	 */
-	public void setReqStatus(String reqStatus) {
+	public void setReqStatus(AuthRequetStatus reqStatus) {
 		this.reqStatus = reqStatus;
 	}
 	

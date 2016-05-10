@@ -3,10 +3,6 @@
  */
 package poc.samsung.fido.rp.contoller.message;
 
-import java.util.Date;
-
-import org.springframework.util.StringUtils;
-
 import com.google.common.base.Optional;
 
 /**
