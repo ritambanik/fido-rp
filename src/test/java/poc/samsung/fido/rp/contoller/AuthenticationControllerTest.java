@@ -3,12 +3,11 @@
  */
 package poc.samsung.fido.rp.contoller;
 
-import static org.hamcrest.text.IsEmptyString.isEmptyString;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.text.IsEmptyString.isEmptyString;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -30,7 +29,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 
 import poc.samsung.fido.rp.FidoRpApplication;
 import poc.samsung.fido.rp.domain.AuthRequest;
