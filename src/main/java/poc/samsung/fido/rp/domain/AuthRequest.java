@@ -15,6 +15,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import poc.samsung.fido.rp.domain.type.AuthRequetStatus;
 
 /**
@@ -104,6 +106,19 @@ public class AuthRequest {
 	 */
 	public void setReqStatus(AuthRequetStatus reqStatus) {
 		this.reqStatus = reqStatus;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		ToStringBuilder builder = new ToStringBuilder(this);
+		builder.append("authId", authId);
+		builder.append("userId", userId);
+		builder.append("reqTime", reqTime);
+		builder.append("reqType", reqType);
+		builder.append("reqStatus", reqStatus);
+		return builder.toString();
 	}
 	
 	

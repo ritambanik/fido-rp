@@ -5,6 +5,8 @@ package poc.samsung.fido.rp.domain;
 
 import java.util.Random;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 /**
  * @author user
  *
@@ -92,6 +94,20 @@ public class Account {
 	 */
 	public void setAccContactNo(String accContactNo) {
 		this.accContactNo = accContactNo;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		ToStringBuilder builder = new ToStringBuilder(this);
+		builder.append("accNo", accNo);
+		builder.append("accFirstName", accFirstName);
+		builder.append("accLastName", accLastName);
+		builder.append("balance", balance);
+		builder.append("accContactNo", accContactNo);
+		return builder.toString();
 	}
 	
 	

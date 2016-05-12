@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.base.Optional;
 import com.google.common.base.Stopwatch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import poc.samsung.fido.rp.contoller.message.RPResponseMsg;
 import poc.samsung.fido.rp.domain.Account;
 import poc.samsung.fido.rp.domain.AuthRequest;
@@ -35,6 +38,9 @@ import poc.samsung.fido.rp.repositories.CustomerRepository;
 @RestController
 @RequestMapping(value = "/fido-rp")
 public class AuthenticationController {
+	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(AuthenticationController.class);
 
 	private static SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMddHHmmss");
 
@@ -48,6 +54,7 @@ public class AuthenticationController {
 	@ResponseBody
 	public RPResponseMsg<Void> verifyLogin(@PathVariable String user,
 			@RequestParam(name = "pwd", required = true) String password) {
+		LOGGER.info("Service 'verifyLogin' called with user = {}", user);
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
@@ -70,6 +77,7 @@ public class AuthenticationController {
 	@RequestMapping(value = "/requestAuthentication/{user}", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
 	public RPResponseMsg<Long> requestAuthentication(@PathVariable String user, @RequestBody AuthRequest authRequest) {
+		LOGGER.info("Service 'requestAuthentication' called with user = {} and request - {}", user, authRequest.toString());
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
@@ -93,6 +101,7 @@ public class AuthenticationController {
 	@ResponseBody
 	public RPResponseMsg<Void> updateAuthorizationStatus(@PathVariable String user,@PathVariable long reqId,
 			@RequestParam(name = "newStatus", required = true) String status) {
+		LOGGER.info("Service 'updateAuthorizationStatus' called with user = {}, request id - {} and status - {}" , user, reqId, status);
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
@@ -127,6 +136,7 @@ public class AuthenticationController {
 	@RequestMapping(value = "/getAuthorizationStatus/{user}/{reqId}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public RPResponseMsg<AuthRequetStatus> checkAuthenticationStatus(@PathVariable String user,@PathVariable long reqId) {
+		LOGGER.info("Service 'getAuthorizationStatus' called with user = {} and request id - {}" , user, reqId);
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
@@ -154,6 +164,7 @@ public class AuthenticationController {
 	@RequestMapping(value = "/saveRecipientDetails/{user}", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
 	public RPResponseMsg<Long> saveRecipientDetails(@PathVariable String user, @RequestBody Account account) {
+		LOGGER.info("Service 'saveRecipientDetails' called with user = {} and recipient - {}" , user, account.toString());
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
