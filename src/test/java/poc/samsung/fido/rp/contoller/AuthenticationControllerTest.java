@@ -3,12 +3,11 @@
  */
 package poc.samsung.fido.rp.contoller;
 
-import static org.hamcrest.text.IsEmptyString.isEmptyString;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.text.IsEmptyString.isEmptyString;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -34,7 +33,10 @@ import com.google.common.collect.Maps;
 
 import poc.samsung.fido.rp.FidoRpApplication;
 import poc.samsung.fido.rp.domain.AuthRequest;
+<<<<<<< HEAD
 import poc.samsung.fido.rp.domain.type.AuthRequetStatus;
+=======
+>>>>>>> origin/master
 import poc.samsung.fido.rp.repositories.AuthRequestRepository;
 
 /**
@@ -120,7 +122,11 @@ public class AuthenticationControllerTest {
 		req.setUserId("ritam");
 		req.setReqType("New");
 		req.setReqTime(Calendar.getInstance().getTime());
+<<<<<<< HEAD
 		req.setReqStatus(AuthRequetStatus.PENDING);
+=======
+		req.setReqStatus("I");
+>>>>>>> origin/master
 		authRepository.save(req);
 
 		Map<String, Object> requestBody = new HashMap<String, Object>();
@@ -132,10 +138,16 @@ public class AuthenticationControllerTest {
 					requestHeaders);
 
 			// Invoking the API
+<<<<<<< HEAD
 			Map<String, Object> apiResponse = (Map) restTemplate
 					.exchange("http://localhost:8080/fido-rp/updateAuthorizationStatus/ritam/" + req.getAuthId()
 							+ "?newStatus=COMPLETE", HttpMethod.PUT, httpEntity, Map.class)
 					.getBody();
+=======
+			Map<String, Object> apiResponse = (Map) restTemplate.exchange(
+					"http://localhost:8080/fido-rp/updateAuthorizationStatus/ritam/" + req.getAuthId() + "?newStatus=R",
+					HttpMethod.PUT, httpEntity, Map.class).getBody();
+>>>>>>> origin/master
 			assertNotNull(apiResponse);
 			assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
 			authRepository.delete(req.getAuthId());
@@ -144,6 +156,7 @@ public class AuthenticationControllerTest {
 			e.printStackTrace();
 		}
 	}
+<<<<<<< HEAD
 
 	/**
 	 * Test method for
@@ -169,4 +182,6 @@ public class AuthenticationControllerTest {
 				equalTo(AuthRequetStatus.valueOf(String.valueOf(apiResponse.get("output")))));
 		authRepository.delete(req.getAuthId());
 	}
+=======
+>>>>>>> origin/master
 }

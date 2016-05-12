@@ -102,7 +102,11 @@ public class AuthenticationController {
 						return createMsg("updateAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 								Optional.of("Request is in the same status; hence not updated"), Optional.absent());
 					} else {
+<<<<<<< HEAD
 						req.setReqStatus(AuthRequetStatus.valueOf(status));
+=======
+						req.setReqStatus(status);
+>>>>>>> origin/master
 						authRequestRepository.save(req);
 						return createMsg("updateAuthorizationStatus", "SUCCESS", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 								Optional.absent(), Optional.absent());
@@ -116,12 +120,17 @@ public class AuthenticationController {
 						Optional.of("Request ID does not exist"), Optional.absent());
 			}
 		} catch (Exception ex) {
+<<<<<<< HEAD
 			return createMsg("updateAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+=======
+			return createMsg("verifyLogin", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+>>>>>>> origin/master
 					Optional.of(ex.getMessage()), Optional.absent());
 		} finally {
 			watch.stop();
 		}
 	}
+<<<<<<< HEAD
 	
 	@RequestMapping(value = "/getAuthorizationStatus/{user}/{reqId}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
@@ -151,6 +160,8 @@ public class AuthenticationController {
 	}
 	
 	
+=======
+>>>>>>> origin/master
 
 	/**
 	 * 
