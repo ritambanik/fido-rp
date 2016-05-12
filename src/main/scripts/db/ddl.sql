@@ -14,7 +14,7 @@ CREATE TABLE CUSTOMER (
   user_id varchar(20) NOT NULL,
   requested_time datetime NOT NULL,
   request_type varchar(8) NOT NULL,
-  request_status varchar(1) NOT NULL,
+  request_status varchar(8) NOT NULL,
   PRIMARY KEY (request_id),
   KEY CUSTOMER_FK_idx (user_id),
   CONSTRAINT `CUSTOMER_FK` FOREIGN KEY (user_id) REFERENCES CUSTOMER (user_id) ON DELETE NO ACTION ON UPDATE NO ACTION
