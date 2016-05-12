@@ -29,7 +29,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 
 import poc.samsung.fido.rp.FidoRpApplication;
 import poc.samsung.fido.rp.domain.AuthRequest;
@@ -84,7 +83,7 @@ public class AuthenticationControllerTest {
 		requestBody.put("userId", "ritam");
 		requestBody.put("reqTime", Calendar.getInstance().getTime());
 		requestBody.put("reqType", "New");
-		requestBody.put("reqStatus", 'I');
+		requestBody.put("reqStatus", AuthRequetStatus.PENDING);
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -168,4 +167,40 @@ public class AuthenticationControllerTest {
 				equalTo(AuthRequetStatus.valueOf(String.valueOf(apiResponse.get("output")))));
 		authRepository.delete(req.getAuthId());
 	}
+	
+	/**
+	 * Test method for
+	 * {@link poc.samsung.fido.rp.contoller.AuthenticationController#requestAuthentication(java.lang.String, poc.samsung.fido.rp.domain.AuthRequest)}
+	 * .
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public final void testSaveRecipientDetails() {
+		// Building the Request body data
+		Map<String, Object> requestBody = new HashMap<String, Object>();
+		requestBody.put("accFirstName", "Frank");
+		requestBody.put("accLastName", "Underwood");
+		requestBody.put("balance", 100.00);
+		requestBody.put("accContactNo", "9178030435");
+		HttpHeaders requestHeaders = new HttpHeaders();
+		requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+		// Creating http entity object with request body and headers
+		try {
+			HttpEntity<String> httpEntity = new HttpEntity<String>(OBJECT_MAPPER.writeValueAsString(requestBody),
+					requestHeaders);
+			// Invoking the API
+			Map<String, Object> apiResponse = restTemplate.postForObject(
+					"http://localhost:8080/fido-rp/saveRecipientDetails/ritam", httpEntity, Map.class,
+					Collections.EMPTY_MAP);
+			assertNotNull(apiResponse);
+			assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
+			System.out.println("Account created with account number - " + apiResponse.get("output"));
+			assertNotEquals(0.00d, apiResponse.get("output"));
+			assertThat(String.valueOf(apiResponse.get("errorMsg")), isEmptyString());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+	}
+	
 }

@@ -21,6 +21,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Stopwatch;
 
 import poc.samsung.fido.rp.contoller.message.RPResponseMsg;
+import poc.samsung.fido.rp.domain.Account;
 import poc.samsung.fido.rp.domain.AuthRequest;
 import poc.samsung.fido.rp.domain.Customer;
 import poc.samsung.fido.rp.domain.type.AuthRequetStatus;
@@ -145,6 +146,27 @@ public class AuthenticationController {
 		} catch (Exception ex) {
 			return createMsg("getAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 					Optional.of(ex.getMessage()), Optional.absent());
+		} finally {
+			watch.stop();
+		}
+	}
+	
+	@RequestMapping(value = "/saveRecipientDetails/{user}", method = RequestMethod.POST, produces = "application/json")
+	@ResponseBody
+	public RPResponseMsg<Long> saveRecipientDetails(@PathVariable String user, @RequestBody Account account) {
+		Stopwatch watch = Stopwatch.createStarted();
+		Date invokedAt = Calendar.getInstance().getTime();
+		try {
+			if (customerRepository.exists(user)) {
+				return createMsg("saveRecipientDetails", "SUCCESS", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+						Optional.absent(), Optional.of(account.getAccNo()));
+			} else {
+				return createMsg("saveRecipientDetails", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+						Optional.of("User '" + user + "' is not registered"), Optional.of(0l));
+			}
+		} catch (Exception ex) {
+			return createMsg("saveRecipientDetails", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+					Optional.of(ex.getMessage()), Optional.of(0l));
 		} finally {
 			watch.stop();
 		}
