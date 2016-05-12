@@ -100,7 +100,7 @@ public class AuthenticationControllerTest {
 			assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
 			assertNotEquals(0l, apiResponse.get("output"));
 			assertThat(String.valueOf(apiResponse.get("errorMsg")), isEmptyString());
-			authRepository.delete((long) (apiResponse.get("output")));
+			authRepository.delete( Long.valueOf(String.valueOf((apiResponse.get("output")))));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -113,7 +113,7 @@ public class AuthenticationControllerTest {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public final void testUpdateAuthorizationStatus() {
+	public final void testUpdateAuthenticationStatus() {
 		AuthRequest req = new AuthRequest();
 		req.setUserId("ritam");
 		req.setReqType("New");
@@ -131,7 +131,7 @@ public class AuthenticationControllerTest {
 
 			// Invoking the API
 			Map<String, Object> apiResponse = (Map) restTemplate
-					.exchange("http://localhost:8080/fido-rp/updateAuthorizationStatus/ritam/" + req.getAuthId()
+					.exchange("http://localhost:8080/fido-rp/updateAuthenticationStatus/ritam/" + req.getAuthId()
 							+ "?newStatus=COMPLETE", HttpMethod.PUT, httpEntity, Map.class)
 					.getBody();
 			assertNotNull(apiResponse);
@@ -160,7 +160,7 @@ public class AuthenticationControllerTest {
 
 		// Invoking the API
 		Map<String, Object> apiResponse = (Map) restTemplate.getForObject(
-				"http://localhost:8080/fido-rp/getAuthorizationStatus/ritam/" + req.getAuthId(), Map.class);
+				"http://localhost:8080/fido-rp/getAuthenticationStatus/ritam/" + req.getAuthId(), Map.class);
 		assertNotNull(apiResponse);
 		assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
 		assertThat(AuthRequetStatus.PENDING,

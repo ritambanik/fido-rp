@@ -97,11 +97,11 @@ public class AuthenticationController {
 		}
 	}
 	
-	@RequestMapping(value = "/updateAuthorizationStatus/{user}/{reqId}", method = RequestMethod.PUT, produces = "application/json")
+	@RequestMapping(value = "/updateAuthenticationStatus/{user}/{reqId}", method = RequestMethod.PUT, produces = "application/json")
 	@ResponseBody
 	public RPResponseMsg<Void> updateAuthorizationStatus(@PathVariable String user,@PathVariable long reqId,
 			@RequestParam(name = "newStatus", required = true) String status) {
-		LOGGER.info("Service 'updateAuthorizationStatus' called with user = {}, request id - {} and status - {}" , user, reqId, status);
+		LOGGER.info("Service 'updateAuthenticationStatus' called with user = {}, request id - {} and status - {}" , user, reqId, status);
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
@@ -109,52 +109,52 @@ public class AuthenticationController {
 				AuthRequest req = authRequestRepository.findOne(reqId);
 				if (user.equals(req.getUserId())) {
 					if (status.equals(req.getReqStatus())) {
-						return createMsg("updateAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+						return createMsg("updateAuthenticationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 								Optional.of("Request is in the same status; hence not updated"), Optional.absent());
 					} else {
 						req.setReqStatus(AuthRequetStatus.valueOf(status));
 						authRequestRepository.save(req);
-						return createMsg("updateAuthorizationStatus", "SUCCESS", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+						return createMsg("updateAuthenticationStatus", "SUCCESS", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 								Optional.absent(), Optional.absent());
 					}
 				} else {
-					return createMsg("updateAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+					return createMsg("updateAuthenticationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 							Optional.of("Request ID does not belong to the given user"), Optional.absent());
 				}
 			} else {
-				return createMsg("updateAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+				return createMsg("updateAuthenticationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 						Optional.of("Request ID does not exist"), Optional.absent());
 			}
 		} catch (Exception ex) {
-			return createMsg("updateAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+			return createMsg("updateAuthenticationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 					Optional.of(ex.getMessage()), Optional.absent());
 		} finally {
 			watch.stop();
 		}
 	}
 	
-	@RequestMapping(value = "/getAuthorizationStatus/{user}/{reqId}", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/getAuthenticationStatus/{user}/{reqId}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public RPResponseMsg<AuthRequetStatus> checkAuthenticationStatus(@PathVariable String user,@PathVariable long reqId) {
-		LOGGER.info("Service 'getAuthorizationStatus' called with user = {} and request id - {}" , user, reqId);
+		LOGGER.info("Service 'getAuthenticationStatus' called with user = {} and request id - {}" , user, reqId);
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
 			if (authRequestRepository.exists(reqId)) {
 				AuthRequest req = authRequestRepository.findOne(reqId);
 				if (user.equals(req.getUserId())) {
-						return createMsg("getAuthorizationStatus", "SUCCESS", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+						return createMsg("getAuthenticationStatus", "SUCCESS", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 								Optional.absent(), Optional.of(req.getReqStatus()));
 				} else {
-					return createMsg("getAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+					return createMsg("getAuthenticationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 							Optional.of("Request ID does not belong to the given user"), Optional.absent());
 				}
 			} else {
-				return createMsg("getAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+				return createMsg("getAAuthenticationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 						Optional.of("Request ID does not exist"), Optional.absent());
 			}
 		} catch (Exception ex) {
-			return createMsg("getAuthorizationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
+			return createMsg("getAuthenticationStatus", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 					Optional.of(ex.getMessage()), Optional.absent());
 		} finally {
 			watch.stop();
