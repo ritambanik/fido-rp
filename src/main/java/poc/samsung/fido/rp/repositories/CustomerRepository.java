@@ -11,6 +11,8 @@ import poc.samsung.fido.rp.domain.Customer;
  * @author user
  *
  */
-public interface CustomerRepository extends JpaRepository<Customer, String> {
+public interface CustomerRepository extends JpaRepository<Customer, String>, CustomerRepositoryCustom {
+	
+    
 
 }

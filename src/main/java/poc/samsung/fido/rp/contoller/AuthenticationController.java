@@ -8,6 +8,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,9 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Stopwatch;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import poc.samsung.fido.rp.contoller.message.RPResponseMsg;
 import poc.samsung.fido.rp.domain.Account;
@@ -36,7 +37,6 @@ import poc.samsung.fido.rp.repositories.CustomerRepository;
  *
  */
 @RestController
-@RequestMapping(value = "/fido-rp")
 public class AuthenticationController {
 	
 	private static final Logger LOGGER = LoggerFactory
@@ -50,15 +50,19 @@ public class AuthenticationController {
 	@Autowired
 	private AuthRequestRepository authRequestRepository;
 
-	@RequestMapping(value = "/login/{user}", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/{rpId}/uaf/login", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
-	public RPResponseMsg<Void> verifyLogin(@PathVariable String user,
-			@RequestParam(name = "pwd", required = true) String password) {
-		LOGGER.info("Service 'verifyLogin' called with user = {}", user);
+	public RPResponseMsg<Void> verifyLogin(@PathVariable String rpId,
+			@RequestBody String credentials) {
+		LOGGER.info("Service 'verifyLogin' called for rpId = {} with credentials = {}", rpId, credentials);
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
-			Customer customer = customerRepository.findOne(user);
+			JsonObject credJson = new JsonParser().parse(credentials).getAsJsonObject();
+			String userId = credJson.get("userId").toString().trim();
+		    String password = credJson.get("password").toString().trim();
+			LOGGER.info("Invoked by = {} with password = {}", userId, password);
+			Customer customer = customerRepository.findOne(userId);
 			if (customer == null || !password.equals(customer.getPassword())) {
 				return createMsg("verifyLogin", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 						Optional.of("Username/password does not match"), Optional.absent());
@@ -74,20 +78,20 @@ public class AuthenticationController {
 		}
 	}
 
-	@RequestMapping(value = "/requestAuthentication/{user}", method = RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value = "/{rpId}/uaf/requestAuthentication", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
-	public RPResponseMsg<Long> requestAuthentication(@PathVariable String user, @RequestBody AuthRequest authRequest) {
-		LOGGER.info("Service 'requestAuthentication' called with user = {} and request - {}", user, authRequest.toString());
+	public RPResponseMsg<Long> requestAuthentication(@PathVariable String rpId, @RequestBody AuthRequest authRequest) {
+		LOGGER.info("Service 'requestAuthentication' called for rpId = {} with request - {}", rpId, authRequest.toString());
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
-			if (customerRepository.exists(user)) {
+			if (customerRepository.exists(authRequest.getUserId())) {
 				authRequestRepository.save(authRequest);
 				return createMsg("requestAuthentication", "SUCCESS", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
 						Optional.absent(), Optional.of(authRequest.getAuthId()));
 			} else {
 				return createMsg("requestAuthentication", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
-						Optional.of("User '" + user + "' is not registered"), Optional.of(0l));
+						Optional.of("User '" + authRequest.getUserId() + "' is not registered"), Optional.of(0l));
 			}
 		} catch (Exception ex) {
 			return createMsg("requestAuthentication", "FAILURE", invokedAt, watch.elapsed(TimeUnit.MILLISECONDS),
@@ -97,11 +101,11 @@ public class AuthenticationController {
 		}
 	}
 	
-	@RequestMapping(value = "/updateAuthenticationStatus/{user}/{reqId}", method = RequestMethod.PUT, produces = "application/json")
+	@RequestMapping(value = "/{rpId}/uaf/updateAuthenticationStatus/{user}/{reqId}", method = RequestMethod.PUT, produces = "application/json")
 	@ResponseBody
-	public RPResponseMsg<Void> updateAuthorizationStatus(@PathVariable String user,@PathVariable long reqId,
+	public RPResponseMsg<Void> updateAuthorizationStatus(@PathVariable String rpId, @PathVariable String user,@PathVariable long reqId,
 			@RequestParam(name = "newStatus", required = true) String status) {
-		LOGGER.info("Service 'updateAuthenticationStatus' called with user = {}, request id - {} and status - {}" , user, reqId, status);
+		LOGGER.info("Service 'updateAuthenticationStatus' called for rpId = {} with user = {}, request id - {} and status - {}" , rpId, user, reqId, status);
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
@@ -133,10 +137,10 @@ public class AuthenticationController {
 		}
 	}
 	
-	@RequestMapping(value = "/getAuthenticationStatus/{user}/{reqId}", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/{rpId}/uaf/getAuthenticationStatus/{user}/{reqId}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public RPResponseMsg<AuthRequetStatus> checkAuthenticationStatus(@PathVariable String user,@PathVariable long reqId) {
-		LOGGER.info("Service 'getAuthenticationStatus' called with user = {} and request id - {}" , user, reqId);
+	public RPResponseMsg<AuthRequetStatus> checkAuthenticationStatus(@PathVariable String rpId, @PathVariable String user,@PathVariable long reqId) {
+		LOGGER.info("Service 'getAuthenticationStatus' called for rpId = {} with user = {} and request id - {}" , rpId, user, reqId);
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
@@ -161,10 +165,10 @@ public class AuthenticationController {
 		}
 	}
 	
-	@RequestMapping(value = "/saveRecipientDetails/{user}", method = RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value = "/{rpId}/uaf/saveRecipientDetails/{user}", method = RequestMethod.POST, produces = "application/json")
 	@ResponseBody
-	public RPResponseMsg<Long> saveRecipientDetails(@PathVariable String user, @RequestBody Account account) {
-		LOGGER.info("Service 'saveRecipientDetails' called with user = {} and recipient - {}" , user, account.toString());
+	public RPResponseMsg<Long> saveRecipientDetails(@PathVariable String rpId, @PathVariable String user, @RequestBody Account account) {
+		LOGGER.info("Service 'saveRecipientDetails' called for rpId = {} with user = {} and recipient - {}" , rpId, user, account.toString());
 		Stopwatch watch = Stopwatch.createStarted();
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {

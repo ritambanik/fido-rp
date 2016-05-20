@@ -16,6 +16,8 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
@@ -43,6 +45,9 @@ import poc.samsung.fido.rp.repositories.AuthRequestRepository;
 @SpringApplicationConfiguration(classes = FidoRpApplication.class)
 @WebIntegrationTest
 public class AuthenticationControllerTest {
+	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(AuthenticationControllerTest.class);
 
 	// Required to Generate JSON content from Java objects
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -61,13 +66,24 @@ public class AuthenticationControllerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public final void testVerifyLogin() {
-		// Invoking the API
-		Map<String, Object> apiResponse = restTemplate.getForObject(
-				"http://localhost:8080/fido-rp/login/ritam?pwd=welcome", Map.class, Collections.EMPTY_MAP);
-		System.out.println("Output = " + apiResponse.toString());
-		assertNotNull(apiResponse);
-		assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
-		assertThat(String.valueOf(apiResponse.get("errorMsg")), isEmptyString());
+		Map<String, Object> requestBody = new HashMap<String, Object>();
+		requestBody.put("userId", "uquiet7167");
+		requestBody.put("password", "_&xyz01#");
+		HttpHeaders requestHeaders = new HttpHeaders();
+		requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+		try {
+			HttpEntity<String> httpEntity = new HttpEntity<String>(OBJECT_MAPPER.writeValueAsString(requestBody),
+					requestHeaders);
+			// Invoking the API
+			Map<String, Object> apiResponse = restTemplate.postForObject("http://localhost:8080/rp1/uaf/login",
+					httpEntity, Map.class, Collections.EMPTY_MAP);
+			LOGGER.info("testVerifyLogin: Output =  {}", apiResponse.toString());
+			assertNotNull(apiResponse);
+			assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
+			assertThat(String.valueOf(apiResponse.get("errorMsg")), isEmptyString());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -80,7 +96,7 @@ public class AuthenticationControllerTest {
 	public final void testRequestAuthentication() {
 		// Building the Request body data
 		Map<String, Object> requestBody = new HashMap<String, Object>();
-		requestBody.put("userId", "ritam");
+		requestBody.put("userId", "uquiet7167");
 		requestBody.put("reqTime", Calendar.getInstance().getTime());
 		requestBody.put("reqType", "New");
 		requestBody.put("reqStatus", AuthRequetStatus.PENDING);
@@ -93,14 +109,14 @@ public class AuthenticationControllerTest {
 					requestHeaders);
 			// Invoking the API
 			Map<String, Object> apiResponse = restTemplate.postForObject(
-					"http://localhost:8080/fido-rp/requestAuthentication/ritam", httpEntity, Map.class,
+					"http://localhost:8080/rp1/uaf/requestAuthentication", httpEntity, Map.class,
 					Collections.EMPTY_MAP);
 			System.out.println("Output = " + apiResponse.toString());
 			assertNotNull(apiResponse);
 			assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
 			assertNotEquals(0l, apiResponse.get("output"));
 			assertThat(String.valueOf(apiResponse.get("errorMsg")), isEmptyString());
-			authRepository.delete( Long.valueOf(String.valueOf((apiResponse.get("output")))));
+			authRepository.delete(Long.valueOf(String.valueOf((apiResponse.get("output")))));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -131,7 +147,7 @@ public class AuthenticationControllerTest {
 
 			// Invoking the API
 			Map<String, Object> apiResponse = (Map) restTemplate
-					.exchange("http://localhost:8080/fido-rp/updateAuthenticationStatus/ritam/" + req.getAuthId()
+					.exchange("http://localhost:8080/rp1/uaf/updateAuthenticationStatus/ritam/" + req.getAuthId()
 							+ "?newStatus=COMPLETE", HttpMethod.PUT, httpEntity, Map.class)
 					.getBody();
 			assertNotNull(apiResponse);
@@ -160,14 +176,14 @@ public class AuthenticationControllerTest {
 
 		// Invoking the API
 		Map<String, Object> apiResponse = (Map) restTemplate.getForObject(
-				"http://localhost:8080/fido-rp/getAuthenticationStatus/ritam/" + req.getAuthId(), Map.class);
+				"http://localhost:8080/rp1/uaf/getAuthenticationStatus/ritam/" + req.getAuthId(), Map.class);
 		assertNotNull(apiResponse);
 		assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
 		assertThat(AuthRequetStatus.PENDING,
 				equalTo(AuthRequetStatus.valueOf(String.valueOf(apiResponse.get("output")))));
 		authRepository.delete(req.getAuthId());
 	}
-	
+
 	/**
 	 * Test method for
 	 * {@link poc.samsung.fido.rp.contoller.AuthenticationController#requestAuthentication(java.lang.String, poc.samsung.fido.rp.domain.AuthRequest)}
@@ -191,7 +207,7 @@ public class AuthenticationControllerTest {
 					requestHeaders);
 			// Invoking the API
 			Map<String, Object> apiResponse = restTemplate.postForObject(
-					"http://localhost:8080/fido-rp/saveRecipientDetails/ritam", httpEntity, Map.class,
+					"http://localhost:8080/rp1/uaf/saveRecipientDetails/ritam", httpEntity, Map.class,
 					Collections.EMPTY_MAP);
 			assertNotNull(apiResponse);
 			assertThat(apiResponse.get("status"), equalTo("SUCCESS"));
@@ -202,5 +218,5 @@ public class AuthenticationControllerTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

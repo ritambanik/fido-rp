@@ -47,6 +47,24 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.samsung.sds.fido</groupId>
+			<artifactId>uaf.server.sdk</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0</version>
+		</dependency>
+		<!-- http://mvnrepository.com/artifact/com.google.code.gson/gson -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
@@ -63,6 +81,10 @@
 			<id>spring-releases</id>
 			<name>Spring Releases</name>
 			<url>http://repo.spring.io/libs-release</url>
+		</repository>
+		<repository>
+			<id>my-local-repo</id>
+			<url>file://${basedir}/my-repo</url>
 		</repository>
 	</repositories>
 
