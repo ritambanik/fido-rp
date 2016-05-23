@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +60,8 @@ public class AuthenticationController {
 		Date invokedAt = Calendar.getInstance().getTime();
 		try {
 			JsonObject credJson = new JsonParser().parse(credentials).getAsJsonObject();
-			String userId = credJson.get("userId").toString().trim();
-		    String password = credJson.get("password").toString().trim();
+			String userId = credJson.get("userId").toString().replaceAll("\"", StringUtils.EMPTY);
+		    String password = credJson.get("password").toString().replaceAll("\"", StringUtils.EMPTY);
 			LOGGER.info("Invoked by = {} with password = {}", userId, password);
 			Customer customer = customerRepository.findOne(userId);
 			if (customer == null || !password.equals(customer.getPassword())) {
